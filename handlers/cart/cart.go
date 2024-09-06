@@ -15,6 +15,7 @@ type cartDto interface {
 	AddCart(bReq model.Cart) (*uuid.UUID, error)
 	UpdateQty(bReq model.Cart) (string, error)
 	DeleteProduct(bReq model.DeleteCartRequest) (string, error)
+	GetProductDetails(productID, userID uuid.UUID) (bool, error)
 }
 
 // Handler is a struct that holds a cartDto.
@@ -132,6 +133,40 @@ func (h *Handler) DeleteProductID(w http.ResponseWriter, r *http.Request) {
 	bReq.UserID = uid
 
 	bResp, err := h.cart.DeleteProduct(bReq)
+	if err != nil {
+		helper.HandleResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	helper.HandleResponse(w, http.StatusOK, bResp)
+}
+
+func (h *Handler) GetDetailCart(w http.ResponseWriter, r *http.Request) {
+	userID := r.PathValue("user_id")
+	if userID == "" {
+		helper.HandleResponse(w, http.StatusBadRequest, "User ID is required")
+		return
+	}
+
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		helper.HandleResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	productID := r.PathValue("product_id")
+	if productID == "" {
+		helper.HandleResponse(w, http.StatusBadRequest, "Product ID is required")
+		return
+	}
+
+	uid2, err := uuid.Parse(productID)
+	if err != nil {
+		helper.HandleResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	bResp, err := h.cart.GetProductDetails(uid2, uid)
 	if err != nil {
 		helper.HandleResponse(w, http.StatusInternalServerError, err.Error())
 		return

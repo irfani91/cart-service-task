@@ -79,3 +79,11 @@ func (c *cart) DeleteProduct(bReq model.DeleteCartRequest) (string, error) {
 
 	return "Product deleted from cart", nil
 }
+
+func (c *cart) GetProductDetails(productID, userID uuid.UUID) (bool, error) {
+	result, err := c.store.GetProductDetails(productID, userID)
+	if err != nil {
+		return false, err
+	}
+	return result, nil
+}

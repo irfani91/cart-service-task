@@ -37,6 +37,7 @@ func (r *Routes) cartRoutes() {
 	r.Router.HandleFunc("POST /cart/add", middleware.ApplyMiddleware(r.Cart.AddCart, middleware.EnabledCors, middleware.LoggerMiddleware()))
 	r.Router.HandleFunc("PUT /cart/update/{user_id}", middleware.ApplyMiddleware(r.Cart.UpdateCart, middleware.EnabledCors, middleware.LoggerMiddleware()))
 	r.Router.HandleFunc("DELETE /cart/delete/{user_id}", middleware.ApplyMiddleware(r.Cart.DeleteProductID, middleware.EnabledCors, middleware.LoggerMiddleware()))
+	r.Router.HandleFunc("GET /cart/{user_id}/{product_id}", middleware.ApplyMiddleware(r.Cart.GetDetailCart, middleware.EnabledCors, middleware.LoggerMiddleware()))
 }
 
 func (r *Routes) SetupRouter() {
