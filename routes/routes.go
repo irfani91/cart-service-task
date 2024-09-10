@@ -3,6 +3,7 @@ package routes
 import (
 	"cart-order-service/config"
 	"cart-order-service/handlers/cart"
+	"cart-order-service/handlers/order"
 	"cart-order-service/util/middleware"
 	"log"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 type Routes struct {
 	Router *http.ServeMux
 	Cart   *cart.Handler
+	Order  *order.Handler
 }
 
 func URLRewriter(baseURLPath string, next http.Handler) http.HandlerFunc {
@@ -40,10 +42,16 @@ func (r *Routes) cartRoutes() {
 	r.Router.HandleFunc("GET /cart/{user_id}/{product_id}", middleware.ApplyMiddleware(r.Cart.GetDetailCart, middleware.EnabledCors, middleware.LoggerMiddleware()))
 }
 
+func (r *Routes) SetupOrder() {
+	r.Router.HandleFunc("POST /order/create", middleware.ApplyMiddleware(r.Order.CreateOrder, middleware.EnabledCors, middleware.LoggerMiddleware()))
+	r.Router.HandleFunc("POST /order/callback", middleware.ApplyMiddleware(r.Order.CallbackPayment, middleware.EnabledCors, middleware.LoggerMiddleware()))
+}
+
 func (r *Routes) SetupRouter() {
 	r.Router = http.NewServeMux()
 	r.SetupBaseURL()
 	r.cartRoutes()
+	r.SetupOrder()
 }
 
 func (r *Routes) Run(port string) {
